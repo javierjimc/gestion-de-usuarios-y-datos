@@ -1,0 +1,36 @@
+{
+  "name": "node-express-web-app",
+  "version": "1.0.0",
+  "description": "Aplicación web backend con Node.js, Express, Sequelize (PostgreSQL) y JWT. Proyecto integrador módulos 6, 7 y 8 - Alkemy.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "initdb": "node src/config/initDb.js",
+    "seed": "node src/seeders/seed.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "sequelize",
+    "postgresql",
+    "jwt",
+    "rest-api"
+  ],
+  "author": "Javier Mariscal",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.4.0",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
