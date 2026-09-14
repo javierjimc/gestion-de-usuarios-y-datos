@@ -94,6 +94,100 @@ Servidor en `http://localhost:3000`.
 
 ---
 
+## 📊 Diagramas
+
+> GitHub renderiza estos diagramas Mermaid automáticamente.
+
+### Flujo de una petición (arquitectura en capas)
+
+Cada capa hace una sola cosa: la ruta no valida, el controlador no toca SQL, el servicio no sabe de HTTP.
+
+```mermaid
+flowchart TD
+  C[Cliente<br/>Postman · frontend · móvil]
+  R[Ruta · routes/]
+  M[Middleware · verifica JWT]
+  Co[Controlador · arma respuesta]
+  S[Servicio · lógica de datos]
+  O[Modelo / ORM · Sequelize]
+  DB[(PostgreSQL)]
+  C --> R --> M --> Co --> S --> O --> DB
+  DB -. respuesta status/message/data .-> C
+```
+
+### Flujo de login con JWT (dos fases)
+
+Fase 1: se obtiene el token. Fase 2: se usa en cada ruta protegida. El servidor no guarda sesiones (stateless): toda la info va firmada dentro del token.
+
+```mermaid
+flowchart TD
+  subgraph F1[Fase 1 · obtener el token]
+    A1[POST /api/auth/login<br/>email, password]
+    A2[Buscar usuario · findByEmail]
+    A3[bcrypt.compare · password correcta?]
+    A4[jwt.sign JWT_SECRET · expira 1h]
+    A5[200 · token]
+    A1 --> A2 --> A3 --> A4 --> A5
+  end
+  subgraph F2[Fase 2 · usar el token en ruta protegida]
+    B1[GET /api/usuarios<br/>Authorization: Bearer token]
+    B2[Middleware · jwt.verify · firma + expiración]
+    D{token válido?}
+    OK[200 · data · acceso concedido]
+    FAIL[401 no autorizado]
+    B1 --> B2 --> D
+    D -->|sí| OK
+    D -->|no| FAIL
+  end
+  A5 -. el cliente guarda el token .-> B1
+```
+
+### Relaciones entre modelos
+
+`Order` y `Product` forman una relación **N:M** resuelta con la tabla intermedia `OrderProduct` (dos relaciones 1:N).
+
+```mermaid
+erDiagram
+  User ||--|| Profile : "tiene (1:1)"
+  User ||--o{ Order : "realiza (1:N)"
+  Order ||--o{ OrderProduct : "contiene"
+  Product ||--o{ OrderProduct : "aparece en"
+
+  User {
+    int id PK
+    string nombre
+    string email
+    string password
+    enum rol
+    string avatar
+  }
+  Profile {
+    int id PK
+    int userId FK
+    text bio
+    string telefono
+  }
+  Order {
+    int id PK
+    int userId FK
+    decimal total
+    enum estado
+  }
+  Product {
+    int id PK
+    string nombre
+    decimal precio
+    int stock
+  }
+  OrderProduct {
+    int orderId FK
+    int productId FK
+    int cantidad
+  }
+```
+
+---
+
 ## 🔐 Autenticación (JWT — Módulo 8)
 
 1. Registrarse: `POST /api/auth/register`.
